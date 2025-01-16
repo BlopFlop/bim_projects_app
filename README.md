@@ -11,7 +11,7 @@
 ## DataModel Сюда ссылку :)
 
 ## Стек :)
-- Python
+- Python 3.11.2
 - FastAPI
 - Выбрать Брокера сообщенй
 - PostgreSQL
