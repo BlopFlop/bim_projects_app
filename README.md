@@ -1,18 +1,22 @@
 # BIM Projects APP
 
 ## О проекте
+Проект предназначен для управления и анализа BIM Проектов.
 
 **Цели:** 
-
 Основные функции:
 
-- **None**
+- **Создание BIM проектов**
+- **Админка для суперпользователя и BIM Специалистов для управления BIM проектами**
+- **Задачи: Архивация, бэкап, и отправка Revit/Navis/IFC моделей заказчику в виде задач в фоновом режиме, если происходит какая либо выгрузка для одного проекта, необходимо блокировать другие задачи для этого проекта**
+- **Фронт для остальных пользователей предоставляющий доступ к информации об информационной наполненности всех моделей/Графики/Время выгрузки, Количество моделей и их пути на сервере, возможность сформировать архив со всеми моделями проекта, а так же выгрузить модели в формат navisworks.**
 
-## DataModel Сюда ссылку :)
+## [DataModel](https://miro.com/welcomeonboard/cGorYW5RVGlOVlpIU1RUWndhcnBiTVlqcEc4NTQ5NVUwMEFMM2kwN241V2lJUmFHV1FtUDdNYysrUkxJZEluamdxUjVmcHR5UENBR2FObWs3TS8rNUw0RTZTMU1ldk41amlCRFVzc3JkRnRLYVc2Yk9uODhERDdiVmMyNFFtUmQhZQ==?share_link_id=656978056681)
 
 ## Стек :)
 - Python 3.11.2
 - FastAPI
+- rpws
 - Выбрать Брокера сообщенй
 - PostgreSQL
 
@@ -34,21 +38,59 @@
 ```
 bim_projects_app
 │
-├── infra/                              Каталог с файлами инфраструктуры
-│   ├── env.example                     Пример конфигурационного файла
-│   └── dev-docker-compose.yml          Настройки для docker compose
+├── docker/     # Каталог с файлами инфраструктуры
+│   ├── env.example     # Пример конфигурационного файла
+│   ├── dev-docker-compose.yml      # Настройки для docker compose
+│   └── Dockerfile      # Настройки для Docker
 │
-├── src/                                Каталог с файлами проекта
-|   └── __init__.py
-│   └── main.py                         Основной запускаемый файл проекта
-│   └── admin/                          Админка
-│   └── core/                           Настройки проекта
-|   |   └── __init__.py
-|   |   └── base.py                     Настройки бд
-|   |   └── config.py                   Конфигурация проекта
-|   |   └── db.py                       Настройки бд
-|   └── utils/                          Вспомогательный модуль
-│
+├── src/      # Базовый каталог проекта
+│   ├── api.py      # Глобавльные роуты API
+│   ├── config.py     # Глобавльный конфиг проекта
+│   ├── constants.py      # Глобальные константы
+│   ├── exceptions.py      # Глобальные ошибки
+│   ├── logging.py      # Конфиг логгирования
+│   ├── main.py       # Точка входа в приложение FastAPI
+│   ├── repository.py      # Глобальный репозиторий для управления 
+│   ├── rpws_.py      # Конфигурация для библиотеки rpws для поиска моделей на RevitServer
+│   ├── __init__.py
+│   │
+│   ├───admin/      # Админка
+│   │   ├── models.py     # Модели бд
+│   │   ├── schemas.py      # Pydantic cхемы
+│   │   ├── views.py      # Вьюхи
+│   │   └── __init__.py
+│   │
+│   ├───auth/       # Аунтефикация
+│   │   ├──models.py
+│   │   ├──views.py
+│   │   └──__init__.py
+│   │
+│   ├───database/       # База данных
+│   │   ├── core.py       # Конфигурация базы данных
+│   │   └── __init__.py
+│   │
+│   ├───project/       # BIM Проект
+│   │   ├── models.py
+│   │   ├── repository.py
+│   │   ├── schemas.py
+│   │   ├── views.py
+│   │   └── __init__.py
+│   │
+│   ├───task/       # Задачи
+│   │   ├── models.py
+│   │   ├── repository.py
+│   │   ├── schemas.py
+│   │   ├── views.py
+│   │   └── __init__.py
+│   │
+│   └───users/       # Пользователи
+│       ├── core.py
+│       ├── models.py
+│       ├── schemas.py
+│       ├── utils.py      # Вспомогательный пакет
+│       ├── views.py
+│       └── __init__.py
+│   
 ├── tests/                              Тестирование
 |   └── conftest.py                     Тестовые компоненты
 │
