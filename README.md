@@ -17,7 +17,7 @@
 - Python 3.11.2
 - FastAPI
 - rpws
-- Выбрать Брокера сообщенй
+- RabbitMQ
 - PostgreSQL
 
 ## Настройка
