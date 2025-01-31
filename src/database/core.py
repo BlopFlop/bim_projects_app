@@ -1,6 +1,5 @@
 from typing import Any, AsyncGenerator
 
-from sqlalchemy import Column, Integer
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -8,32 +7,48 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import (
     DeclarativeMeta,
+    Mapped,
     declarative_base,
     declared_attr,
+    mapped_column,
     sessionmaker,
 )
 
-from src.config import settings
-
-engine: AsyncEngine = create_async_engine(settings.database_url)
-
-AsyncSessionLocal: sessionmaker = sessionmaker(engine, class_=AsyncSession)
-
-
-async def get_async_session() -> AsyncGenerator[Any, AsyncSession]:
-    """Generator session."""
-    async with AsyncSessionLocal() as async_session:
-        yield async_session
+from config import database_config
 
 
 class PreBase:
-    """Class for add the same ones methods and properties."""
+    """Base model."""
 
     @declared_attr
-    def __tablename__(cls):
+    def __tablename__(cls) -> str:
+        """Autocreate tablename."""
+        cls.__name__: str
         return cls.__name__.lower()
 
-    id = Column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(
+        primary_key=True,
+        autoincrement=True,
+        nullable=False,
+        comment="Номер в базе данных",
+    )
 
 
 Base: DeclarativeMeta = declarative_base(cls=PreBase)
+
+engine: AsyncEngine = create_async_engine(
+    database_config.database_url,
+    pool_pre_ping=True
+)
+
+AsyncSessionLocal: AsyncSession = sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
+
+
+async def get_async_session() -> AsyncGenerator[AsyncSession, Any]:
+    """Async sessionmaker."""
+    async with AsyncSessionLocal() as async_session:
+        yield async_session

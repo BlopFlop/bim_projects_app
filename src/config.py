@@ -1,24 +1,36 @@
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
-from .constants import ENV_PATH
+from constants import ENV_PATH
 
 
-class Settings(BaseSettings):
-    """Settings for current project."""
+class _SettingsBase(BaseSettings):
+    """Base settings."""
 
-    # FastAPI Project
-    name_project: str = Field(alias="NAME_PROJECT")
-    secret: str = Field(alias="SECRET")
-    first_superuser_email: str = Field(alias="FIRST_SUPERUSER_EMAIL")
-    first_superuser_password: str = Field(alias="FIRST_SUPERUSER_PASSWORD")
+    class Config:
+        """Config for the meta class in current settings."""
 
-    # Database .evn
-    postgres_db: str = Field(alias="POSTGRES_DB")
-    postgres_user: str = Field(alias="POSTGRES_USER")
-    postgres_password: str = Field(alias="POSTGRES_PASSWORD")
-    db_host: str = Field(alias="POSTGRES_SERVER")
-    db_port: str = Field(alias="POSTGRES_PORT")
+        env_file = ENV_PATH
+        extra = "ignore"
+
+
+class SettingsApp(_SettingsBase):
+    """Settings FastApi application."""
+
+    name_project: str = Field(alias="APP_NAME_PROJECT")
+    secret: str = Field(alias="APP_SECRET")
+    first_superuser_email: str = Field(alias="APP_FIRST_SUPERUSER_EMAIL")
+    first_superuser_password: str = Field(alias="APP_FIRST_SUPERUSER_PASSWORD")
+
+
+class SettingsDatabase(_SettingsBase):
+    """Settings Database."""
+
+    postgres_db: str = Field(alias="DB")
+    postgres_user: str = Field(alias="DB_USER")
+    postgres_password: str = Field(alias="DB_PASSWORD")
+    db_host: str = Field(alias="DB_SERVER")
+    db_port: str = Field(alias="DB_PORT")
 
     @property
     def database_url(self) -> str:
@@ -31,11 +43,12 @@ class Settings(BaseSettings):
             self.postgres_db,
         )
 
-    class Config:
-        """Config for the meta class in current settings."""
 
-        env_file = ENV_PATH
-        extra = "ignore"
+class RabbitMQSettings(_SettingsBase):
+    """Settings for RabbitMQ."""
+    pass
 
 
-settings = Settings()
+application_config = SettingsApp()
+database_config = SettingsDatabase()
+rabbit_config = RabbitMQSettings()

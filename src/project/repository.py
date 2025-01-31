@@ -1,1 +1,1 @@
-from src.repository import RepositoryBase
+from repository import RepositoryBase
