@@ -1,49 +1,50 @@
-from pathlib import Path
-
 import pytest
 import pytest_asyncio
-from mixer.backend.sqlalchemy import Mixer as _mixer
-from sqlalchemy import create_engine
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
-
-from src.database import Base
-
-import pytest
 
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-TEST_DB = BASE_DIR / "test.db"
-SQLALCHEMY_DATABASE_URL = f"sqlite+aiosqlite:///{str(TEST_DB)}"
-engine = create_async_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
+from fastapi.testclient import TestClient
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    create_async_engine,
+    async_sessionmaker
 )
-TestingSessionLocal = sessionmaker(
-    class_=AsyncSession,
-    autocommit=False,
-    autoflush=False,
-    bind=engine,
+from sqlalchemy.pool import NullPool
+
+from src.database import Base, get_async_session
+from src.config import test_database_config
+from src.main import app
+
+
+engine_test = create_async_engine(
+    test_database_config.database_url,
+    poolclass=NullPool
 )
+async_session_maker = async_sessionmaker(
+    engine_test, class_=AsyncSession,
+    expire_on_commit=False,
+    autoflush=False
+)
+
+Base.metadata.bind = engine_test
 
 
 async def override_db():
-    async with TestingSessionLocal() as session:
+    async with async_session_maker() as session:
         yield session
 
 
 @pytest_asyncio.fixture(autouse=True)
 async def init_db():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
     yield
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+    async with engine_test.begin() as conn:
+        for table in reversed(Base.metadata.sorted_tables):
+            await conn.execute(table.delete())
+        conn.commit()
 
 
 @pytest.fixture
-def mixer():
-    mixer_engine = create_engine(f"sqlite:///{str(TEST_DB)}")
-    session = sessionmaker(bind=mixer_engine)
-    return _mixer(session=session(), commit=True)
+def test_client():
+    app.dependency_overrides = {}
+    app.dependency_overrides[get_async_session] = override_db
+    with TestClient(app) as client:
+        yield client

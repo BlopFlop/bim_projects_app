@@ -22,12 +22,27 @@ router = APIRouter()
     summary="Получить все разделы проектирования",
     description="Получает разделы проектирования из базы данных.",
 )
-async def get_all_bim_models(
-    bim_model_repository: ModelSectionRepository = Depends(
+async def get_all_model_sections(
+    model_section_repository: ModelSectionRepository = Depends(
         get_model_section_repository
     ),
 ) -> list[ModelSection]:
-    return await bim_model_repository.get_multi()
+    return await model_section_repository.get_multi()
+
+
+@router.get(
+    "/{model_section_id}",
+    response_model=ModelSectionDB,
+    summary="Получить раздел проектирования по id",
+    description="Получает раздел проектирования по id из базы данных.",
+)
+async def get_model_section(
+    model_section_id: int,
+    model_section_repository: ModelSectionRepository = Depends(
+        get_model_section_repository
+    ),
+) -> list[ModelSection]:
+    return await model_section_repository.get(obj_id=model_section_id)
 
 
 @router.post(
@@ -35,42 +50,42 @@ async def get_all_bim_models(
     response_model=ModelSectionDB,
     summary="Создает раздел проектирования.",
 )
-async def create_bim_model(
-    bim_model: ModelSectionCreate,
-    bim_model_repository: ModelSectionRepository = Depends(
+async def create_model_section(
+    model_section: ModelSectionCreate,
+    model_section_repository: ModelSectionRepository = Depends(
         get_model_section_repository
     ),
 ) -> ModelSectionDB:
-    new_project = await bim_model_repository.create(obj_in=bim_model)
+    new_project = await model_section_repository.create(obj_in=model_section)
     return new_project
 
 
 @router.delete(
-    "/{bim_model_id}",
+    "/{model_section_id}",
     response_model=ModelSectionDB,
     summary="Удалить раздел проектирования.",
 )
-async def delete_bim_model(
-    bim_model_id: int,
-    bim_model_repository: ModelSectionRepository = Depends(
+async def delete_model_section(
+    model_section_id: int,
+    model_section_repository: ModelSectionRepository = Depends(
         get_model_section_repository
     ),
 ) -> ModelSection:
-    bim_model = await bim_model_repository.get(obj_id=bim_model_id)
-    return await bim_model_repository.remove(db_obj=bim_model)
+    model_section = await model_section_repository.get(obj_id=model_section_id)
+    return await model_section_repository.remove(db_obj=model_section)
 
 
 @router.patch(
-    "/{bim_model_id}",
+    "/{model_section_id}",
     response_model=ModelSectionDB,
     summary="Изменить раздел проектирования.",
 )
-async def change_bim_model(
-    bim_model_id: int,
+async def change_model_section(
+    model_section_id: int,
     obj_in: ModelSectionUpdate,
-    bim_model_repository: ModelSectionRepository = Depends(
+    model_section_repository: ModelSectionRepository = Depends(
         get_model_section_repository
     ),
 ) -> ModelSection:
-    bim_model = await bim_model_repository.get(obj_id=bim_model_id)
-    return await bim_model_repository.update(bim_model, obj_in)
+    model_section = await model_section_repository.get(obj_id=model_section_id)
+    return await model_section_repository.update(model_section, obj_in)

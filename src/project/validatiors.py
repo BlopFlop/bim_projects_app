@@ -1,3 +1,4 @@
+from typing import Sequence
 from http import HTTPStatus
 
 from fastapi import HTTPException
@@ -8,7 +9,7 @@ from repository import RepositoryBase
 
 async def check_fields_duplicate(
     schema: CreateSchemaType | UpdateSchemaType,
-    fields_set: list[str],
+    fields_set: Sequence[str],
     repository: RepositoryBase
 ) -> None | HTTPException:
     """Check duplicate unique field in DB."""

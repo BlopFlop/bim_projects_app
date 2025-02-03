@@ -22,12 +22,28 @@ router = APIRouter()
     summary="Получить все BIM модели",
     description="Получает BIM модели из базы данных.",
 )
-async def get_all_bim_models(
+async def get_bim_model(
     bim_model_repository: BIMModelRepository = Depends(
         get_bim_model_repository
     ),
 ) -> list[BIMModel]:
     return await bim_model_repository.get_multi()
+
+
+@router.get(
+    "/{bim_model_id}",
+    response_model=BIMModelSchemaDB,
+    summary="Получить все BIM модель по id",
+    description="Получает BIM модель оп id из базы данных.",
+)
+async def get_bim_model(
+    bim_model_id: int,
+    bim_model_repository: BIMModelRepository = Depends(
+        get_bim_model_repository
+    ),
+) -> list[BIMModel]:
+    bim_model = await bim_model_repository.get(obj_id=bim_model_id)
+    return bim_model
 
 
 @router.post(

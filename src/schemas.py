@@ -7,7 +7,7 @@ class CreateSchemaType(BaseModel):
     class Config:
         json_schema_extra = {
             "example": {
-                "any": "test schema",
+                "any": "type schema",
             }
         }
 
@@ -22,7 +22,7 @@ class DBSchemaType(CreateSchemaType):
     class Config:
         """Config class for this model."""
 
-        orm_mode = True
+        from_attributes = True
         json_schema_extra = {
             "example": {
                 "any": "test schema",

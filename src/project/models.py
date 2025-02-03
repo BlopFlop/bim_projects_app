@@ -3,6 +3,7 @@ from typing import Final
 import enum
 
 from sqlalchemy import CheckConstraint, String, Integer, DateTime, ForeignKey
+from sqlalchemy.sql.functions import func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base
@@ -62,7 +63,7 @@ class Project(Base):
         )
     )
     created_on: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
         default=datetime.now(timezone.utc),
         comment="Дата и время создания проекта."
@@ -112,6 +113,16 @@ class Project(Base):
         cascade="all, delete-orphan"
     )
 
+    @classmethod
+    def get_unique_fields(cls) -> tuple[str]:
+        return (cls.name.key, cls.code.key, cls.image.key)
+
+    def __str__(self) -> str:
+        return (
+            f"Project: {self.name} Code: {self.code}"
+            f" CountModels: {len(self.models)}"
+        )
+
 
 class RevitServer(Base):
     """RevitServer model."""
@@ -137,6 +148,13 @@ class RevitServer(Base):
         back_populates="server",
         cascade="all, delete-orphan"
     )
+
+    @classmethod
+    def get_unique_fields(cls) -> tuple[str]:
+        return (cls.name.key,)
+
+    def __str__(self) -> str:
+        return f"RevitServer: {self.name} Status: {self.status}"
 
 
 class ModelSection(Base):
@@ -176,6 +194,13 @@ class ModelSection(Base):
         back_populates="section",
         cascade="save-update"
     )
+
+    @classmethod
+    def get_unique_fields(cls) -> tuple[str]:
+        return (cls.name.key,)
+
+    def __str__(self) -> str:
+        return f"Section: {self.name}"
 
 
 class ModelTypeEnum(str, enum.Enum):
@@ -246,13 +271,13 @@ class BIMModel(Base):
         ),
     )
     created_on: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
         default=datetime.now(timezone.utc),
         comment="Дата и время создания файла."
     )
     updated_on: Mapped[datetime] = mapped_column(
-        DateTime,
+        DateTime(timezone=True),
         nullable=False,
         default=datetime.now(timezone.utc),
         comment="Дата и время обновления файла."
@@ -286,3 +311,10 @@ class BIMModel(Base):
         "Project",
         back_populates="models"
     )
+
+    @classmethod
+    def get_unique_fields(cls) -> tuple[str]:
+        return (cls.name_file.key,)
+
+    def __str__(self) -> str:
+        return f"Model: {self.name_file}"

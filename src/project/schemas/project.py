@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from pydantic import (
@@ -47,6 +47,7 @@ class ProjectSchemaBase(BaseModel):
         )
     )
     created_on: Optional[datetime] = Field(
+        datetime.now(timezone.utc),
         title="Date created project",
         description="Дата и время создания проекта."
     )
@@ -89,7 +90,7 @@ class ProjectSchemaBase(BaseModel):
                 ),
                 "code": "NIKT",
                 "image": "static_path",
-                "created_on": "2025-01-31 12:28:58.206249+00:00",
+                # "created_on": "2025-01-31 12:28:58.206249+00:00",
                 "base_path": r"R:\101_BIM-Projects",
                 "arch_path": r"R:\100_Archive",
                 "ftp_path": r"\\l-ftp\Root\Unipro_FTP-01"
@@ -181,7 +182,7 @@ class ProjectSchemaDB(ProjectSchemaBase):
     class Config:
         """Config class for this model."""
 
-        orm_mode = True
+        from_attributes = True
         json_schema_extra = {
             "example": {
                 "id": 1,

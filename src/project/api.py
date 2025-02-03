@@ -11,20 +11,20 @@ router = APIRouter()
 router.include_router(
     project_router,
     prefix="/projects",
-    tags=["Project"]
+    tags=("Project",)
 )
 router.include_router(
     bim_model_router,
     prefix="/models",
-    tags=["Bim model"]
+    tags=("Bim model",)
 )
 router.include_router(
     revit_server_router,
     prefix="/servers",
-    tags=["Revit server"]
+    tags=("Revit server",)
 )
 router.include_router(
     model_section_router,
     prefix="/sectons",
-    tags=["Sections"]
+    tags=("Sections",)
 )
