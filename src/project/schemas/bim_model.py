@@ -17,7 +17,7 @@ class BIMModelSchemaBase(BaseModel):
     name_file: str = Field(
         min_length=1,
         max_length=150,
-        title="Name file(*whthout extention).",
+        title="Name file(*whthout extention)",
         description=(
             "Название модели, обязательное строковое поле;"
             " допустимая длина строки — от 1 до 150 символов включительно;"

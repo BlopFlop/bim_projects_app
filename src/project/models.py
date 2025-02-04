@@ -3,7 +3,6 @@ from typing import Final
 import enum
 
 from sqlalchemy import CheckConstraint, String, Integer, DateTime, ForeignKey
-from sqlalchemy.sql.functions import func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base

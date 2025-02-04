@@ -5,6 +5,7 @@ from database.core import (
     get_async_session
 )
 from project.models import * # noqa
+from users.models import * # noqa
 
 __all__ = [
     "engine",

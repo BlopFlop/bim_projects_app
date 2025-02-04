@@ -1,7 +1,7 @@
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
-from constants import ENV_PATH
+from constants import ENV_PATH, SECRET_KEY, ALGORITHM_KEY
 
 
 class _SettingsBase(BaseSettings):
@@ -25,7 +25,7 @@ class SettingsApp(_SettingsBase):
 
     @property
     def get_auth_data(self):
-        return {"secret_key": self.secret, "algorithm": self.algoritm}
+        return {SECRET_KEY: self.secret, ALGORITHM_KEY: self.algoritm}
 
 
 class SettingsDatabase(_SettingsBase):
