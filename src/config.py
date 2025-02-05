@@ -19,8 +19,13 @@ class SettingsApp(_SettingsBase):
 
     name_app: str = Field(alias="APP_NAME_PROJECT")
     secret: str = Field(alias="APP_SECRET")
+
+    first_superuser_first_name: str = "Firstsuper"
+    first_superuser_last_name: str = "Lastsuper"
+    first_superuser_phone: str = "+79993324242"
     first_superuser_email: str = Field(alias="APP_FIRST_SUPERUSER_EMAIL")
     first_superuser_password: str = Field(alias="APP_FIRST_SUPERUSER_PASSWORD")
+
     algoritm: str = Field(alias="ALGORITHM")
 
     @property

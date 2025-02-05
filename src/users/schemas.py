@@ -1,16 +1,23 @@
+from typing import Optional
+
 from fastapi.exceptions import HTTPException
 
 from pydantic import (
     BaseModel,
     EmailStr,
-    Field, 
+    Field,
     field_validator,
-    model_validator
+    # model_validator
 )
 import re
 
 
-class UserRegister(BaseModel):
+class JwtTokenSchema(BaseModel):
+    access_token: Optional[str]
+    refresh_token: Optional[str]
+
+
+class UserRegisterSchema(BaseModel):
     email: EmailStr = Field(
         min_length=6,
         max_length=256,
@@ -64,13 +71,16 @@ class UserRegister(BaseModel):
             raise HTTPException(422, ext_msg)
         return value
 
-    @model_validator(mode="before")
-    def validate_not_equal_email_and_password(self) -> HTTPException:
+    # @model_validator(mode="before")
+    # def validate_not_equal_email_and_password(self) -> HTTPException:
 
-        if self["email"] == self["password"]:
-            ext_msg = "Почта и пароль не могут быть одинаковыми."
-            raise HTTPException(422, ext_msg)
-        return self
+    #     if not isinstance(self, BaseModel) and self["email"] == self["password"]:
+    #         ext_msg = "Почта и пароль не могут быть одинаковыми."
+    #         raise HTTPException(422, ext_msg)
+    #     elif self.email == self.password:
+    #         ext_msg = "Почта и пароль не могут быть одинаковыми."
+    #         raise HTTPException(422, ext_msg)
+    #     return self
 
     class Config:
         """Config class for this model."""
@@ -86,7 +96,23 @@ class UserRegister(BaseModel):
         }
 
 
-class UserAuth(BaseModel):
+class UserRegisterAdminSchema(UserRegisterSchema):
+
+    is_admin: bool = Field(
+        True,
+        comment="Булево значение, определяющее пользователя администратора."
+    )
+
+
+class UserRegisterSuperuserSchema(UserRegisterAdminSchema):
+
+    is_superuser: bool = Field(
+        True,
+        comment="Булево значение, определяющее пользователя суперюзера."
+    )
+
+
+class UserAuthSchema(BaseModel):
     email: EmailStr = Field(
         min_length=6,
         max_length=256,
@@ -110,5 +136,163 @@ class UserAuth(BaseModel):
             "example": {
                 "email": "user@example.com",
                 "password": "super_password",
+            }
+        }
+
+
+class UserUpdateSchema(UserRegisterSchema):
+    email: Optional[EmailStr] = Field(
+        None,
+        min_length=6,
+        max_length=256,
+        title="Email",
+        description=(
+            "Номер пользователя, уникальное строковое поле;"
+            " Допустимая длина строки - от 7 до 18 символов включительно;"
+        ),
+    )
+    phone_number: Optional[str] = Field(
+        None,
+        min_length=7,
+        max_length=18,
+        title="Phone number",
+        description=(
+            "Номер телефона в международном формате, начинающийся с '+'"
+            " уникальное строковое поле; допустимая длина"
+            " строки - от 7 до 18 символов включительно;"
+        )
+    )
+    first_name: Optional[str] = Field(
+        None,
+        min_length=3,
+        max_length=256,
+        description=(
+            "Имя пользователя, строковое поле; "
+            "Допустимая длина строки - от 3 до 256 символов включительно;"
+        )
+    )
+    last_name: Optional[str] = Field(
+        None,
+        min_length=3,
+        max_length=256,
+        description=(
+            "Фамилия пользователя, строковое поле; "
+            "Допустимая длина строки - от 3 до 256 символов включительно;"
+        )
+    )
+
+
+class UserUpdateRolesSchema(UserAuthSchema):
+    is_admin: Optional[bool] = Field(
+        title="Is Admin",
+        comment="Булево значение, определяющее пользователя администратора."
+    )
+    is_superuser: Optional[bool] = Field(
+        title="Is Superuser",
+        comment="Булево значение, определяющее пользователя суперюзера."
+    )
+
+    class Config:
+        """Config class for this model."""
+
+        json_schema_extra = {
+            "example": {
+                "email": "user@example.com",
+                "password": "super_password",
+            }
+        }
+
+
+class UserChangePassword(BaseModel):
+    old_password: str = Field(
+        min_length=5,
+        max_length=50,
+        title="Old Password",
+        description=(
+            "Старый пароль, поле длинной от 5 до 50 символов влючительно."
+        )
+    )
+    new_password: str = Field(
+        min_length=5,
+        max_length=50,
+        title="New Password",
+        description=(
+            "Новый пароль, поле длинной от 5 до 50 символов влючительно."
+        )
+    )
+
+    class Config:
+        """Config class for this model."""
+
+        json_schema_extra = {
+            "example": {
+                "old_password": "old_password",
+                "new_password": "new_password",
+            }
+        }
+
+
+class UserSchemaDB(BaseModel):
+    id: int = Field(
+        title="Id",
+        description="Айди пользователя в бд"
+    )
+    email: EmailStr = Field(
+        min_length=6,
+        max_length=256,
+        title="Email",
+        description=(
+            "Номер пользователя, уникальное строковое поле;"
+            " Допустимая длина строки - от 7 до 18 символов включительно;"
+        ),
+    )
+    phone_number: str = Field(
+        min_length=7,
+        max_length=18,
+        title="Phone number",
+        description=(
+            "Номер телефона в международном формате, начинающийся с '+'"
+            " уникальное строковое поле; допустимая длина"
+            " строки - от 7 до 18 символов включительно;"
+        )
+    )
+    first_name: str = Field(
+        min_length=3,
+        max_length=256,
+        description=(
+            "Имя пользователя, строковое поле; "
+            "Допустимая длина строки - от 3 до 256 символов включительно;"
+        )
+    )
+    last_name: str = Field(
+        min_length=3,
+        max_length=256,
+        description=(
+            "Фамилия пользователя, строковое поле; "
+            "Допустимая длина строки - от 3 до 256 символов включительно;"
+        )
+    )
+    is_admin: bool = Field(
+        True,
+        comment="Булево значение, определяющее пользователя администратора."
+    )
+    is_superuser: bool = Field(
+        True,
+        comment="Булево значение, определяющее пользователя суперюзера."
+    )
+
+    class Config:
+        """Config class for this model."""
+
+        from_attributes = True
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "email": "user@example.com",
+                "phone_number": "+874493831",
+                "first_name": "Алексей",
+                "last_name": "Яковенко",
+                "is_admin": False,
+                "is_superuser": False
             }
         }

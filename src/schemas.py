@@ -1,6 +1,19 @@
 from pydantic import BaseModel
 
 
+class MessageSchema(BaseModel):
+    message: str
+
+    class Config:
+        """Config class for this model."""
+
+        json_schema_extra = {
+            "example": {
+                "message": "Confirm operations.",
+            }
+        }
+
+
 class CreateSchemaType(BaseModel):
     """Type schema."""
 

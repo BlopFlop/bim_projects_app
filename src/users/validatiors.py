@@ -40,21 +40,40 @@ async def check_number_duplicate(
         )
 
 
-async def validate_email_and_password(
+async def validate_email(
     email: EmailStr,
-    password: str,
     repository: RepositoryBase
 ) -> User:
     user: User = await repository.get_obj_for_field_arg(
         "email", arg=email, many=False
     )
-    if user and verify_password(
+    if not user:
+        exc_msg = "Неверная почта."
+        raise HTTPException(
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail=exc_msg,
+        )
+    return user
+
+
+def validate_password(
+    user: User,
+    password: str,
+) -> None:
+    if not verify_password(
         plain_password=password,
         hashed_password=user.password
     ):
+        ext_msg = "Старый пароль неверный."
+        raise HTTPException(
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail=ext_msg
+        )
+
+
+async def validate_user_id(id: int, user_repository: RepositoryBase) -> User:
+    user = await user_repository.get(id)
+    if user:
         return user
-    exc_msg = "Неверная почта или пароль."
-    raise HTTPException(
-        status_code=HTTPStatus.UNAUTHORIZED,
-        detail=exc_msg,
-    )
+    exc_msg = "Пользователя с данным id не существует."
+    raise HTTPException(HTTPStatus.BAD_REQUEST, detail=exc_msg)

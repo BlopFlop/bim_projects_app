@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 import pytest_asyncio
 
@@ -10,9 +12,13 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.pool import NullPool
 
-from src.database import Base, get_async_session
+from src.database import Base, get_async_session, User
 from src.config import test_database_config
 from src.main import app
+
+from fastapi.testclient import TestClient
+
+from src.users.auth import get_current_admin_user, get_current_user
 
 
 engine_test = create_async_engine(
@@ -27,6 +33,12 @@ async_session_maker = async_sessionmaker(
 
 Base.metadata.bind = engine_test
 
+BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
+
+pytest_plugins = [
+    "tests.fixtures.users",
+]
+
 
 async def override_db():
     async with async_session_maker() as session:
@@ -40,11 +52,3 @@ async def init_db():
         for table in reversed(Base.metadata.sorted_tables):
             await conn.execute(table.delete())
         conn.commit()
-
-
-@pytest.fixture
-def test_client():
-    app.dependency_overrides = {}
-    app.dependency_overrides[get_async_session] = override_db
-    with TestClient(app) as client:
-        yield client

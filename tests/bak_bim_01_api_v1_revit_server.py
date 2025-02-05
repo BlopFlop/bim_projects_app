@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 
-from conftest import async_session_maker
+from tests.conftest import async_session_maker
 from fastapi.testclient import TestClient
 from fastapi import Response
 

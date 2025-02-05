@@ -9,6 +9,7 @@ from constants import (
     DATE_FORMAT
 )
 from api import main_api_v1_router
+from users import create_first_superuser
 
 
 configure_logging(
@@ -19,9 +20,15 @@ configure_logging(
 )
 
 
+# async def lifespan(app: FastAPI):
+#     await create_first_superuser()
+#     yield
+
+
 app = FastAPI(
     title=application_config.name_app,
     description=DESCRITPION_FAST_API_APP,
+    # lifespan=lifespan
 )
 app.include_router(
     main_api_v1_router,

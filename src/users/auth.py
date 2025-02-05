@@ -1,5 +1,4 @@
-from fastapi import Request, HTTPException, Depends
-from pydantic import EmailStr
+from fastapi import Request, HTTPException
 from http import HTTPStatus
 
 from passlib.context import CryptContext
@@ -9,19 +8,23 @@ from datetime import datetime, timedelta, timezone
 from repository import RepositoryBase
 from config import application_config
 from constants import SECRET_KEY, ALGORITHM_KEY, USER_ACCESS_TOKEN_KEY
+from users.models import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def get_password_hash(password: str) -> str:
+    """Make hashed password."""
     return pwd_context.hash(password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Compare between str pass and hashed pass."""
     return pwd_context.verify(plain_password, hashed_password)
 
 
 def create_access_token(data: dict) -> str:
+    """Create jwt token."""
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(days=30)
     to_encode.update({"exp": expire})
@@ -35,6 +38,7 @@ def create_access_token(data: dict) -> str:
 
 
 def get_token(request: Request) -> str:
+    """Get jwt token from cookies."""
     token = request.cookies.get(USER_ACCESS_TOKEN_KEY)
     if token:
         return token
@@ -45,10 +49,8 @@ def get_token(request: Request) -> str:
     )
 
 
-async def get_current_user(
-    repository: RepositoryBase,
-    token: str = Depends(get_token),
-):
+async def get_current_user(token: str, repository: RepositoryBase) -> User:
+    """Get user from database and jwt token from cookies."""
     try:
         auth_data = application_config.get_auth_data
         payload = jwt.decode(
@@ -89,3 +91,15 @@ async def get_current_user(
         )
 
     return user
+
+
+async def get_current_admin_user(
+    token: str,
+    repository: RepositoryBase
+) -> User:
+    """Get administration user."""
+    user = await get_current_user(token, repository)
+    if user.is_admin or user.is_superuser:
+        return user
+    ext_msg = "Недостаточно прав!"
+    raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail=ext_msg)
