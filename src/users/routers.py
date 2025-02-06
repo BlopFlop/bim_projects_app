@@ -58,7 +58,8 @@ async def register_user(
     "/login/",
     response_model=JwtTokenSchema,
     summary="Авторизация пользователя.",
-    description="Авторизует вас и возвращает токен."
+    description="Авторизует вас и возвращает токен.",
+    status_code=201,
 )
 async def auth_user(
     response: Response,
@@ -99,7 +100,8 @@ async def get_me(
     "/me/",
     response_model=UserSchemaDB,
     summary="Изменить пользователя.",
-    description="Изменяет текущего пользователя выполнившего запрос."
+    description="Изменяет текущего пользователя выполнившего запрос.",
+    status_code=201,
 )
 async def change_me(
     user_update: UserUpdateSchema,
@@ -120,26 +122,25 @@ async def change_me(
 
 @router.delete(
     "/me/",
-    response_model=UserSchemaDB,
     summary="Удалить пользователя.",
-    description="Удаляет текущего пользователя выполнившего запрос."
+    description="Удаляет текущего пользователя выполнившего запрос.",
+    status_code=204
 )
 async def change_me(
-    user_auth: UserAuthSchema,
     token: str = Depends(get_token),
     user_repository: UserRepository = Depends(get_user_repository)
 ):
     user = await get_current_user(token, user_repository)
-    await validate_email(email=user_auth.email, repository=user_repository)
-    validate_password(user=user, password=user_auth.password)
-    return await user_repository.remove(user)
+    await user_repository.remove(user)
+    return MessageSchema(message="Вы были удалены.")
 
 
 @router.patch(
     "/me/change_password/",
     response_model=MessageSchema,
     summary="Изменить пароль пользователя.",
-    description="Изменяет пароль текущего пользователя выполнившего запрос."
+    description="Изменяет пароль текущего пользователя выполнившего запрос.",
+    status_code=201,
 )
 async def change_password(
     change_pass_data: UserChangePassword,
@@ -152,7 +153,7 @@ async def change_password(
         password=change_pass_data.old_password
     )
     await user_repository.change_password(
-        user=user,
+        db_obj=user,
         password=change_pass_data.new_password
     )
     return MessageSchema(message="Пароль успешно изменен.")
@@ -160,6 +161,7 @@ async def change_password(
 
 @router.post(
     "/logout/",
+    response_model=MessageSchema,
     summary="Выйти из системы.",
     description="Выводит пользователя из ситемы."
 )
@@ -180,7 +182,7 @@ async def get_all_users(
     token: str = Depends(get_token),
     user_repository: UserRepository = Depends(get_user_repository)
 ):
-    get_current_admin_user(token, user_repository)
+    await get_current_admin_user(token, user_repository)
     return await user_repository.get_multi()
 
 
@@ -197,7 +199,7 @@ async def get_user(
     token: str = Depends(get_token),
     user_repository: UserRepository = Depends(get_user_repository)
 ):
-    get_current_admin_user(token, user_repository)
+    await get_current_admin_user(token, user_repository)
     return await validate_user_id(user_id, user_repository=user_repository)
 
 
@@ -207,7 +209,8 @@ async def get_user(
     summary="Изменить пользователя по id",
     description=(
         "Изменяет пользователя по id если у вас есть права администратора."
-    )
+    ),
+    status_code=201
 )
 async def change_user(
     user_id: int,
@@ -215,9 +218,9 @@ async def change_user(
     token: str = Depends(get_token),
     user_repository: UserRepository = Depends(get_user_repository)
 ):
-    get_current_admin_user(token, user_repository)
+    await get_current_admin_user(token, user_repository)
     user = await validate_user_id(
-        user_id=user_id,
+        id=user_id,
         user_repository=user_repository
     )
     await check_email_duplicate(
@@ -233,20 +236,21 @@ async def change_user(
 
 @router.delete(
     "/users/{user_id}/",
-    response_model=UserSchemaDB,
     summary="Удалить пользователя по id",
     description=(
         "Удаляет пользователя по id если у вас есть права администратора."
-    )
+    ),
+    status_code=204
 )
 async def delete_user(
     user_id: int,
     token: str = Depends(get_token),
     user_repository: UserRepository = Depends(get_user_repository)
 ):
-    get_current_admin_user(token, user_repository)
+    await get_current_admin_user(token, user_repository)
     user = await validate_user_id(
-        user_id=user_id,
+        id=user_id,
         user_repository=user_repository
     )
-    return await user_repository.remove(user)
+    await user_repository.remove(user)
+    return MessageSchema(message="Пользователь удален.")

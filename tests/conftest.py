@@ -45,7 +45,7 @@ async def override_db():
         yield session
 
 
-@pytest_asyncio.fixture(autouse=True)
+@pytest_asyncio.fixture(loop_scope="session", scope="module", autouse=True)
 async def init_db():
     yield
     async with engine_test.begin() as conn:
