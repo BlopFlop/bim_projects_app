@@ -11,7 +11,7 @@ class BIMModelRepository(RepositoryBase):
 
 
 async def get_bim_model_repository(
-    session: AsyncSession = Depends(get_async_session)
+    session: AsyncSession = Depends(get_async_session),
 ) -> BIMModelRepository:
     """Create BIMModel repository."""
 

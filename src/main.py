@@ -1,36 +1,32 @@
 from fastapi import FastAPI
 
+from api import main_api_v1_router
 from config import application_config
-from logging_ import configure_logging
 from constants import (
+    DATE_FORMAT,
     DESCRITPION_FAST_API_APP,
     LOG_DIR,
     LOG_FORMAT,
-    DATE_FORMAT
 )
-from api import main_api_v1_router
+from logging_ import configure_logging
 from users import create_first_superuser
-
 
 configure_logging(
     log_dir=LOG_DIR,
     name_app=application_config.name_app,
     date_format=DATE_FORMAT,
-    log_format=LOG_FORMAT
+    log_format=LOG_FORMAT,
 )
 
 
-# async def lifespan(app: FastAPI):
-#     await create_first_superuser()
-#     yield
+async def lifespan(app: FastAPI):
+    await create_first_superuser()
+    yield
 
 
 app = FastAPI(
     title=application_config.name_app,
     description=DESCRITPION_FAST_API_APP,
-    # lifespan=lifespan
+    lifespan=lifespan,
 )
-app.include_router(
-    main_api_v1_router,
-    prefix="/api/v1"
-)
+app.include_router(main_api_v1_router, prefix="/api/v1")

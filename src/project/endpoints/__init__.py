@@ -7,5 +7,5 @@ __all__ = [
     "bim_model_router",
     "model_section_router",
     "project_router",
-    "revit_server_router"
+    "revit_server_router",
 ]

@@ -11,7 +11,7 @@ class ProjectRepository(RepositoryBase):
 
 
 async def get_project_repository(
-    session: AsyncSession = Depends(get_async_session)
+    session: AsyncSession = Depends(get_async_session),
 ) -> ProjectRepository:
     """Create project repository."""
 

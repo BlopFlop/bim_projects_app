@@ -1,15 +1,5 @@
-from database.core import (
-    engine,
-    AsyncSessionLocal,
-    Base,
-    get_async_session
-)
-from project.models import * # noqa
-from users.models import * # noqa
+from database.core import engine, AsyncSessionLocal, Base, get_async_session
+from project.models import *  # noqa
+from users.models import *  # noqa
 
-__all__ = [
-    "engine",
-    "AsyncSessionLocal",
-    "Base",
-    "get_async_session"
-]
+__all__ = ["engine", "AsyncSessionLocal", "Base", "get_async_session"]

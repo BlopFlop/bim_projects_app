@@ -1,12 +1,8 @@
 from datetime import datetime
-from typing import Optional, Final
+from typing import Final, Optional
 
 from fastapi.exceptions import HTTPException
-from pydantic import (
-    BaseModel,
-    Field,
-    field_validator,
-)
+from pydantic import BaseModel, Field, field_validator
 
 from project.models import ModelTypeEnum
 
@@ -21,19 +17,19 @@ class BIMModelSchemaBase(BaseModel):
         description=(
             "Название модели, обязательное строковое поле;"
             " допустимая длина строки — от 1 до 150 символов включительно;"
-        )
+        ),
     )
     type: ModelTypeEnum = Field(
         default=ModelTypeEnum.SUPPORT,
         title="Model type",
-        description="Тип модели."
+        description="Тип модели.",
     )
     version: int = Field(
         title="Version file",
         description=(
             "Версия Revit, обязательное целочисленное поле;"
             " допустимое значение от 2000 до 2100 включительно"
-        )
+        ),
     )
     extention: str = Field(
         min_length=1,
@@ -42,7 +38,7 @@ class BIMModelSchemaBase(BaseModel):
         description=(
             "Расширение файла, обязательное строковое поле; "
             "Допустимая длина строки - от 1 до 10 включительно;"
-        )
+        ),
     )
     path: str = Field(
         min_length=1,
@@ -51,15 +47,14 @@ class BIMModelSchemaBase(BaseModel):
         description=(
             "Путь до файла, обязательное строковое поле;"
             " допустимая длина строки — от 1 до 200 символов включительно;"
-        )
+        ),
     )
     created_on: Optional[datetime] = Field(
-        title="Date created model.",
-        description="Дата и время создания файла."
+        title="Date created model.", description="Дата и время создания файла."
     )
     updated_on: Optional[datetime] = Field(
         title="Date updated model.",
-        description="Дата и время обновления файла."
+        description="Дата и время обновления файла.",
     )
 
     class Config:
@@ -73,7 +68,7 @@ class BIMModelSchemaBase(BaseModel):
                 "extention": "rvt",
                 "path": "011_NIKT/011_01_WIP/01_AR",
                 "created_on": "2025-01-31 12:28:58.206249+00:00",
-                "updated_on": "2025-01-31 12:28:58.206249+00:00"
+                "updated_on": "2025-01-31 12:28:58.206249+00:00",
             }
         }
 
@@ -84,7 +79,8 @@ class BIMModelSchemaBase(BaseModel):
         if not (MIN_VER <= value <= MAX_VER):
             except_msg = (
                 f"Значение {value} должно быть в пределах"
-                f" значений от {MIN_VER} до {MAX_VER} включительно.")
+                f" значений от {MIN_VER} до {MAX_VER} включительно."
+            )
             raise HTTPException(400, detail=except_msg)
         return value
 
@@ -103,19 +99,19 @@ class BIMModelSchemaUpdate(BIMModelSchemaBase):
         description=(
             "Название модели, обязательное строковое поле;"
             " допустимая длина строки — от 1 до 150 символов включительно;"
-        )
+        ),
     )
     type: Optional[ModelTypeEnum] = Field(
         default=ModelTypeEnum.SUPPORT,
         title="Model type",
-        description="Тип модели."
+        description="Тип модели.",
     )
     version: Optional[int] = Field(
         title="Version file",
         description=(
             "Версия Revit, обязательное целочисленное поле;"
             " допустимое значение от 2000 до 2100 включительно"
-        )
+        ),
     )
     extention: Optional[str] = Field(
         min_length=1,
@@ -124,7 +120,7 @@ class BIMModelSchemaUpdate(BIMModelSchemaBase):
         description=(
             "Расширение файла, обязательное строковое поле; "
             "Допустимая длина строки - от 1 до 10 включительно;"
-        )
+        ),
     )
     path: Optional[str] = Field(
         min_length=1,
@@ -133,7 +129,7 @@ class BIMModelSchemaUpdate(BIMModelSchemaBase):
         description=(
             "Путь до файла, обязательное строковое поле;"
             " допустимая длина строки — от 1 до 200 символов включительно;"
-        )
+        ),
     )
 
 
@@ -141,8 +137,7 @@ class BIMModelSchemaDB(BIMModelSchemaBase):
     """BIM model schema DB."""
 
     id: int = Field(
-        title="Id BIM model in db",
-        description="Id BIM модели в базе данных"
+        title="Id BIM model in db", description="Id BIM модели в базе данных"
     )
 
     class Config:
@@ -158,6 +153,6 @@ class BIMModelSchemaDB(BIMModelSchemaBase):
                 "extention": "rvt",
                 "path": "011_NIKT/011_01_WIP/01_AR",
                 "created_on": "2025-01-31 12:28:58.206249+00:00",
-                "updated_on": "2025-01-31 12:28:58.206249+00:00"
+                "updated_on": "2025-01-31 12:28:58.206249+00:00",
             }
         }

@@ -1,7 +1,7 @@
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
-from constants import ENV_PATH, SECRET_KEY, ALGORITHM_KEY
+from constants import ALGORITHM_KEY, ENV_PATH, SECRET_KEY
 
 
 class _SettingsBase(BaseSettings):
@@ -56,11 +56,13 @@ class SettingsDatabase(_SettingsBase):
 
 class RabbitMQSettings(_SettingsBase):
     """Settings for RabbitMQ."""
+
     pass
 
 
 class SettingsTestDatabase(_SettingsBase):
     """Settings for test database."""
+
     postgres_db: str = Field(alias="TEST_DB")
     postgres_user: str = Field(alias="TEST_DB_USER")
     postgres_password: str = Field(alias="TEST_DB_PASSWORD")

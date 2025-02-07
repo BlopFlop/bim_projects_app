@@ -2,10 +2,10 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_async_session
-from users.auth import get_password_hash
-from users.schemas import UserRegisterSchema
-from users.models import User
 from repository import RepositoryBase
+from users.auth import get_password_hash
+from users.models import User
+from users.schemas import UserRegisterSchema
 
 
 class UserRepository(RepositoryBase):
@@ -25,7 +25,7 @@ class UserRepository(RepositoryBase):
 
 
 async def get_user_repository(
-    session: AsyncSession = Depends(get_async_session)
+    session: AsyncSession = Depends(get_async_session),
 ) -> UserRepository:
     """Get User repository."""
 

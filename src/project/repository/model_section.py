@@ -10,8 +10,8 @@ class ModelSectionRepository(RepositoryBase):
     """ModelSection repository."""
 
 
-async def get_model_section_repository(
-    session: AsyncSession = Depends(get_async_session)
+async def get_section_repo(
+    session: AsyncSession = Depends(get_async_session),
 ) -> ModelSectionRepository:
     """Create ModelSection repository."""
 

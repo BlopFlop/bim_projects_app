@@ -1,14 +1,11 @@
 from fastapi import APIRouter, Depends
 
 from project.models import BIMModel
+from project.repository import BIMModelRepository, get_bim_model_repository
 from project.schemas import (
     BIMModelSchemaCreate,
+    BIMModelSchemaDB,
     BIMModelSchemaUpdate,
-    BIMModelSchemaDB
-)
-from project.repository import (
-    BIMModelRepository,
-    get_bim_model_repository
 )
 
 # from project.validatiors import check_fields_duplicate

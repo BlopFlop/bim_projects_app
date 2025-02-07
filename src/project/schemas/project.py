@@ -1,10 +1,7 @@
 from datetime import datetime, timezone
 from typing import Optional
 
-from pydantic import (
-    BaseModel,
-    Field,
-)
+from pydantic import BaseModel, Field
 
 
 class ProjectSchemaBase(BaseModel):
@@ -17,7 +14,7 @@ class ProjectSchemaBase(BaseModel):
         description=(
             "Короткое внутреннее имя проекта."
             " Допустимая длина строки — от 1 до 150 символов включительно;"
-        )
+        ),
     )
     description: str = Field(
         min_length=1,
@@ -26,7 +23,7 @@ class ProjectSchemaBase(BaseModel):
         description=(
             "Длинное имя(с адресом и т.д.) или описание проекта."
             " допустимая длина строки — от 1 до 350 символов включительно;"
-        )
+        ),
     )
     code: str = Field(
         min_length=1,
@@ -36,7 +33,7 @@ class ProjectSchemaBase(BaseModel):
             "Код проекта, обязательное уникальное строковое поле, по данному"
             " коду будут искаться модели в директориях; допустимая длина "
             "строки - от 1 до 50 символов включительно."
-        )
+        ),
     )
     image: Optional[str] = Field(
         max_length=150,
@@ -44,12 +41,12 @@ class ProjectSchemaBase(BaseModel):
         description=(
             "Путь до изоображения;"
             " допустимая длина строки - от 0 до 150 символов включительно;"
-        )
+        ),
     )
     created_on: Optional[datetime] = Field(
         datetime.now(timezone.utc),
         title="Date created project",
-        description="Дата и время создания проекта."
+        description="Дата и время создания проекта.",
     )
 
     base_path: str = Field(
@@ -68,7 +65,7 @@ class ProjectSchemaBase(BaseModel):
         description=(
             "Путь до архивной директории, обязательное строковое поле;"
             " допустимая длина строки — от 1 до 200 символов включительно;"
-        )
+        ),
     )
     ftp_path: str = Field(
         min_length=1,
@@ -93,7 +90,7 @@ class ProjectSchemaBase(BaseModel):
                 # "created_on": "2025-01-31 12:28:58.206249+00:00",
                 "base_path": r"R:\101_BIM-Projects",
                 "arch_path": r"R:\100_Archive",
-                "ftp_path": r"\\l-ftp\Root\Unipro_FTP-01"
+                "ftp_path": r"\\l-ftp\Root\Unipro_FTP-01",
             }
         }
 
@@ -112,7 +109,7 @@ class ProjectSchemaUpdate(ProjectSchemaBase):
         description=(
             "Короткое внутреннее имя проекта."
             " Допустимая длина строки — от 1 до 150 символов включительно;"
-        )
+        ),
     )
     description: Optional[str] = Field(
         min_length=1,
@@ -121,7 +118,7 @@ class ProjectSchemaUpdate(ProjectSchemaBase):
         description=(
             "Длинное имя(с адресом и т.д.) или описание проекта."
             " допустимая длина строки — от 1 до 350 символов включительно;"
-        )
+        ),
     )
     code: Optional[str] = Field(
         min_length=1,
@@ -131,7 +128,7 @@ class ProjectSchemaUpdate(ProjectSchemaBase):
             "Код проекта, обязательное уникальное строковое поле, по данному"
             " коду будут искаться модели в директориях; допустимая длина "
             "строки - от 1 до 50 символов включительно."
-        )
+        ),
     )
     image: Optional[str] = Field(
         max_length=150,
@@ -139,7 +136,7 @@ class ProjectSchemaUpdate(ProjectSchemaBase):
         description=(
             "Путь до изоображения;"
             " допустимая длина строки - от 0 до 150 символов включительно;"
-        )
+        ),
     )
 
     base_path: Optional[str] = Field(
@@ -158,7 +155,7 @@ class ProjectSchemaUpdate(ProjectSchemaBase):
         description=(
             "Путь до архивной директории, обязательное строковое поле;"
             " допустимая длина строки — от 1 до 200 символов включительно;"
-        )
+        ),
     )
     ftp_path: Optional[str] = Field(
         min_length=1,
@@ -175,8 +172,7 @@ class ProjectSchemaDB(ProjectSchemaBase):
     """Project DB schema."""
 
     id: int = Field(
-        title="Id project in db",
-        description="Id проекта в базе данных"
+        title="Id project in db", description="Id проекта в базе данных"
     )
 
     class Config:
@@ -196,6 +192,6 @@ class ProjectSchemaDB(ProjectSchemaBase):
                 "created_on": "2025-01-31 12:28:58.206249+00:00",
                 "base_path": r"R:\101_BIM-Projects",
                 "arch_path": r"R:\100_Archive",
-                "ftp_path": r"\\l-ftp\Root\Unipro_FTP-01"
+                "ftp_path": r"\\l-ftp\Root\Unipro_FTP-01",
             }
         }

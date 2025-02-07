@@ -10,8 +10,8 @@ class RevitServerRepository(RepositoryBase):
     """RevitServer repository."""
 
 
-async def get_revit_server_repository(
-    session: AsyncSession = Depends(get_async_session)
+async def get_rs_repository(
+    session: AsyncSession = Depends(get_async_session),
 ) -> RevitServerRepository:
     """Create RevitServer repository."""
 

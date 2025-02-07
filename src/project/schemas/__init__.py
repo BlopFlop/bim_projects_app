@@ -1,22 +1,19 @@
 from project.schemas.bim_model import (
     BIMModelSchemaCreate,
     BIMModelSchemaUpdate,
-    BIMModelSchemaDB
+    BIMModelSchemaDB,
 )
 from project.schemas.model_section import (
     ModelSectionCreate,
     ModelSectionUpdate,
-    ModelSectionDB
+    ModelSectionDB,
 )
 from project.schemas.project import (
     ProjectSchemaCreate,
     ProjectSchemaUpdate,
-    ProjectSchemaDB
+    ProjectSchemaDB,
 )
-from project.schemas.revit_server import (
-    RevitServerCreate,
-    RevitServerDB
-)
+from project.schemas.revit_server import RevitServerCreate, RevitServerDB
 
 __all__ = [
     "BIMModelSchemaDB",
@@ -29,5 +26,5 @@ __all__ = [
     "ProjectSchemaUpdate",
     "ProjectSchemaDB",
     "RevitServerCreate",
-    "RevitServerDB"
+    "RevitServerDB",
 ]

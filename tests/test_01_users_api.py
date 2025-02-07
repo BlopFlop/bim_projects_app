@@ -1,11 +1,17 @@
 from typing import Any
 
 import pytest
-import pytest_asyncio
-
 from fastapi.testclient import TestClient
 
 from tests.fixtures.users import (
+    invalid_user_data_1,
+    invalid_user_data_2,
+    invalid_user_data_3,
+    invalid_user_data_4,
+    invalid_user_data_5,
+    invalid_user_data_6,
+    invalid_user_data_7,
+    invalid_user_data_8,
     valid_user_data_1,
     valid_user_data_2,
     valid_user_data_3,
@@ -15,45 +21,31 @@ from tests.fixtures.users import (
     valid_user_data_7,
     valid_user_data_8,
     valid_user_data_9,
-
-    invalid_user_data_1,
-    invalid_user_data_2,
-    invalid_user_data_3,
-    invalid_user_data_4,
-    invalid_user_data_5,
-    invalid_user_data_6,
-    invalid_user_data_7,
-    invalid_user_data_8
 )
-
 
 REGISTER_URL = "/api/v1/auth/register/"
 LOGIN_URL = "/api/v1/auth/login/"
 LOGOUT_URL = "/api/v1/auth/logout/"
 REGISTER_URL = "/api/v1/auth/register/"
-ME_URL = "/api/v1/auth/me/"
-CHANGE_PASS_URL = "/api/v1/auth/me/change_password/"
-USERS_URL = "/api/v1/auth/users/"
+ME_URL = "/api/v1/users/me/"
+CHANGE_PASS_URL = "/api/v1/users/me/change_password/"
+USERS_URL = "/api/v1/users/"
 
 
 def register_and_login_client(
-    test_client: TestClient,
-    user_data: dict[str: Any]
+    test_client: TestClient, user_data: dict[str:Any]
 ):
     test_client.post(REGISTER_URL, json=user_data)
     user_data = {
         "email": user_data.get("email"),
-        "password": user_data.get("password")
+        "password": user_data.get("password"),
     }
     test_client.post(LOGIN_URL, json=user_data)
     return test_client.post(LOGIN_URL, json=user_data)
 
 
 def login_client(client: TestClient, email: str, password: str):
-    user_data = {
-        "email": email,
-        "password": password
-    }
+    user_data = {"email": email, "password": password}
     return client.post(LOGIN_URL, json=user_data)
 
 
@@ -63,9 +55,9 @@ def login_client(client: TestClient, email: str, password: str):
         valid_user_data_1,
         valid_user_data_2,
         valid_user_data_3,
-    )
+    ),
 )
-def test_register(test_client: TestClient, user_data: dict[str: Any]):
+def test_register(test_client: TestClient, user_data: dict[str:Any]):
     response = test_client.post(REGISTER_URL, json=user_data)
     assert response.status_code == 201, (
         "Проверьте статус ответа API: при регистрации пользователя "
@@ -80,7 +72,7 @@ def test_register(test_client: TestClient, user_data: dict[str: Any]):
         "is_admin",
         "is_superuser",
         "last_name",
-        "phone_number"
+        "phone_number",
     }
     missing_keys = expected_keys - data.keys()
     assert not missing_keys, (
@@ -105,6 +97,25 @@ def test_register(test_client: TestClient, user_data: dict[str: Any]):
 @pytest.mark.parametrize(
     "user_data",
     (
+        valid_user_data_1,
+        valid_user_data_2,
+        valid_user_data_3,
+    ),
+)
+def test_register_duplicate_data(
+    test_client: TestClient, user_data: dict[str:Any]
+):
+    response = test_client.post(REGISTER_URL, json=user_data)
+    assert response.status_code == 409, (
+        "Проверьте статус ответа API: при регистрации пользователя "
+        "с данными которые уже есть в базе корректный POST-запрос к"
+        f" эндпоинту {REGISTER_URL} должен вернуть ответ со статусом 409."
+    )
+
+
+@pytest.mark.parametrize(
+    "user_data",
+    (
         invalid_user_data_1,
         invalid_user_data_2,
         invalid_user_data_3,
@@ -113,11 +124,10 @@ def test_register(test_client: TestClient, user_data: dict[str: Any]):
         invalid_user_data_6,
         invalid_user_data_7,
         invalid_user_data_8,
-    )
+    ),
 )
 def test_register_invalid_data(
-    test_client: TestClient,
-    user_data: dict[str: Any]
+    test_client: TestClient, user_data: dict[str:Any]
 ):
     response = test_client.post(REGISTER_URL, json=user_data)
     assert response.status_code == 422, (
@@ -138,13 +148,13 @@ def test_register_invalid_data(
         valid_user_data_1,
         valid_user_data_2,
         valid_user_data_3,
-    )
+    ),
 )
-def test_login(test_client: TestClient, user_data: dict[str: Any]):
+def test_login(test_client: TestClient, user_data: dict[str:Any]):
     response = test_client.post(REGISTER_URL, json=user_data)
     user_data = {
         "email": user_data.get("email"),
-        "password": user_data.get("password")
+        "password": user_data.get("password"),
     }
     response = test_client.post(LOGIN_URL, json=user_data)
     assert response.status_code == 201, (
@@ -153,10 +163,7 @@ def test_login(test_client: TestClient, user_data: dict[str: Any]):
         "должен вернуть ответ со статусом 201."
     )
     data = response.json()
-    expected_keys = {
-        "access_token",
-        "refresh_token"
-    }
+    expected_keys = {"access_token", "refresh_token"}
     missing_keys = expected_keys - data.keys()
     assert not missing_keys, (
         f"В ответе на корректный POST-запрос к эндпоинту `{LOGIN_URL}` не "
@@ -170,16 +177,13 @@ def test_login(test_client: TestClient, user_data: dict[str: Any]):
         invalid_user_data_5,
         invalid_user_data_6,
         invalid_user_data_7,
-        invalid_user_data_8
-    )
+        invalid_user_data_8,
+    ),
 )
-def test_login_invalid_data(
-    test_client: TestClient,
-    user_data: dict[str: Any]
-):
+def test_login_invalid_data(test_client: TestClient, user_data: dict[str:Any]):
     user_data = {
         "email": user_data.get("email"),
-        "password": user_data.get("password")
+        "password": user_data.get("password"),
     }
     response = test_client.post(LOGIN_URL, json=user_data)
     assert response.status_code == 422, (
@@ -195,9 +199,9 @@ def test_login_invalid_data(
         valid_user_data_1,
         valid_user_data_2,
         valid_user_data_3,
-    )
+    ),
 )
-def test_get_me(test_client: TestClient, user_data: dict[str: Any]):
+def test_get_me(test_client: TestClient, user_data: dict[str:Any]):
     register_and_login_client(test_client, user_data)
 
     response = test_client.get(ME_URL)
@@ -230,9 +234,9 @@ def test_get_me(test_client: TestClient, user_data: dict[str: Any]):
         valid_user_data_1,
         valid_user_data_2,
         valid_user_data_3,
-    )
+    ),
 )
-def test_logout(test_client: TestClient, user_data: dict[str: Any]):
+def test_logout(test_client: TestClient, user_data: dict[str:Any]):
     register_and_login_client(test_client, user_data)
     response = test_client.post(LOGOUT_URL)
     assert response.status_code == 200, (
@@ -270,13 +274,13 @@ def test_get_me_unregister(test_client: TestClient):
         (valid_user_data_3, invalid_user_data_4, 422),
         (valid_user_data_3, invalid_user_data_5, 422),
         (valid_user_data_3, invalid_user_data_6, 422),
-    )
+    ),
 )
 def test_change_me(
     test_client: TestClient,
-    user_data: dict[str: Any],
-    change_user_data: dict[str: Any],
-    status_code: int
+    user_data: dict[str:Any],
+    change_user_data: dict[str:Any],
+    status_code: int,
 ):
     register_and_login_client(test_client, user_data)
 
@@ -322,11 +326,11 @@ def test_change_me(
         valid_user_data_7,
         valid_user_data_8,
         valid_user_data_9,
-    )
+    ),
 )
 def test_change_password(
     test_client: TestClient,
-    user_data: dict[str: Any],
+    user_data: dict[str:Any],
 ):
     register_and_login_client(test_client, user_data)
 
@@ -344,10 +348,7 @@ def test_change_password(
         f"должен вернуть ответ со статусом 201."
     )
 
-    user_data = {
-        "email": user_data.get("email"),
-        "password": new_password
-    }
+    user_data = {"email": user_data.get("email"), "password": new_password}
     response = test_client.post(LOGIN_URL, json=user_data)
 
     assert response.status_code == 201, (
@@ -363,16 +364,16 @@ def test_change_password(
         valid_user_data_7,
         valid_user_data_8,
         valid_user_data_9,
-    )
+    ),
 )
 def test_delete_me(
     test_client: TestClient,
-    user_data: dict[str: Any],
+    user_data: dict[str:Any],
 ):
     register_and_login_client(test_client, user_data)
     delete_data = {
         "email": user_data.get("email"),
-        "password": user_data.get("password")
+        "password": user_data.get("password"),
     }
     response = test_client.delete(ME_URL)
 
@@ -395,15 +396,14 @@ def test_delete_me(
         valid_user_data_7,
         valid_user_data_8,
         valid_user_data_9,
-    )
+    ),
 )
 def test_login_unregister_user(
-    test_client: TestClient,
-    user_data: dict[str: Any]
+    test_client: TestClient, user_data: dict[str:Any]
 ):
     user_data = {
         "email": user_data.get("email"),
-        "password": user_data.get("password")
+        "password": user_data.get("password"),
     }
     response = test_client.post(LOGIN_URL, json=user_data)
     assert response.status_code == 401, (
@@ -432,7 +432,7 @@ async def test_get_all_users(test_client: TestClient, superuser_db):
     login_client(
         client=test_client,
         email=superuser_db.email,
-        password=superuser_db.password
+        password=superuser_db.password,
     )
     response = test_client.get(USERS_URL)
     assert response.status_code == 200, (
@@ -458,20 +458,15 @@ async def test_get_all_users(test_client: TestClient, superuser_db):
     for user_data in data:
         missing_keys = keys - user_data.keys()
         assert not missing_keys, (
-            f"В ответе на корректный POST-запрос к эндпоинту `{REGISTER_URL}` не "
-            f'хватает следующих ключей: `{"`, `".join(missing_keys)}`'
+            f"В ответе на корректный POST-запрос к эндпоинту `{REGISTER_URL}` "
+            f'не хватает следующих ключей: `{"`, `".join(missing_keys)}`'
         )
 
 
 @pytest.mark.asyncio
-async def test_get_all_users_not_admin_user(
-    test_client: TestClient,
-    user_db
-):
+async def test_get_all_users_not_admin_user(test_client: TestClient, user_db):
     login_client(
-        client=test_client,
-        email=user_db.email,
-        password=user_db.password
+        client=test_client, email=user_db.email, password=user_db.password
     )
     response = test_client.get(USERS_URL)
     assert response.status_code == 403, (
@@ -500,7 +495,7 @@ async def test_get_one_user(test_client: TestClient, superuser_db):
     login_client(
         client=test_client,
         email=superuser_db.email,
-        password=superuser_db.password
+        password=superuser_db.password,
     )
     response = test_client.get(USERS_URL)
     data = response.json()[0]
@@ -531,14 +526,11 @@ async def test_get_one_user(test_client: TestClient, superuser_db):
 
 
 @pytest.mark.asyncio
-async def test_get_one_user_invalid_id(
-    test_client: TestClient,
-    superuser_db
-):
+async def test_get_one_user_invalid_id(test_client: TestClient, superuser_db):
     login_client(
         client=test_client,
         email=superuser_db.email,
-        password=superuser_db.password
+        password=superuser_db.password,
     )
     invalid_id = 912391203
     url = USERS_URL + f"{invalid_id}/"
@@ -552,14 +544,9 @@ async def test_get_one_user_invalid_id(
 
 
 @pytest.mark.asyncio
-async def test_get_one_user_not_admin_user(
-    test_client: TestClient,
-    user_db
-):
+async def test_get_one_user_not_admin_user(test_client: TestClient, user_db):
     login_client(
-        client=test_client,
-        email=user_db.email,
-        password=user_db.password
+        client=test_client, email=user_db.email, password=user_db.password
     )
     url = USERS_URL + "1/"
     response = test_client.get(USERS_URL)
@@ -589,15 +576,15 @@ async def test_update_user(test_client: TestClient, superuser_db, user_db):
     login_client(
         client=test_client,
         email=superuser_db.email,
-        password=superuser_db.password
+        password=superuser_db.password,
     )
     response = test_client.get(USERS_URL)
     data = response.json()
 
     for item in data:
         if (
-            user_db.email == item.get("email") or
-            item.get("email") == superuser_db.email
+            user_db.email == item.get("email")
+            or item.get("email") == superuser_db.email
         ):
             continue
         id_ = item.get("id")
@@ -605,7 +592,7 @@ async def test_update_user(test_client: TestClient, superuser_db, user_db):
             "email": "new" + item.get("email"),
             "first_name": "new" + item.get("first_name"),
             "last_name": "new" + item.get("last_name"),
-            "phone_number": item.get("phone_number") + "0"
+            "phone_number": item.get("phone_number") + "0",
         }
         url = USERS_URL + f"{id_}/"
         response = test_client.patch(url, json=change_data)
@@ -614,31 +601,29 @@ async def test_update_user(test_client: TestClient, superuser_db, user_db):
             f"админом корректный PATCH-запрос к эндпоинту {url} "
             "должен вернуть ответ со статусом 201."
         )
-        data = response.json()
+        patch_data = response.json()
+
         response = test_client.get(url)
         data_get = response.json()
-        assert data == data_get, (
+        assert patch_data == data_get, (
             "После изменения пользователя, и получения этого же пользователя "
             "по id изменненные данные должны быть идентичны "
-            f"{data} != {data_get}"
+            f"{patch_data} != {data_get}"
         )
 
 
 @pytest.mark.asyncio
-async def test_update_user_invalid_id(
-    test_client: TestClient,
-    superuser_db
-):
+async def test_update_user_invalid_id(test_client: TestClient, superuser_db):
     login_client(
         client=test_client,
         email=superuser_db.email,
-        password=superuser_db.password
+        password=superuser_db.password,
     )
     change_data = {
         "email": valid_user_data_1.get("email"),
         "first_name": valid_user_data_1.get("first_name"),
         "last_name": valid_user_data_1.get("last_name"),
-        "phone_number": valid_user_data_1.get("phone_number")
+        "phone_number": valid_user_data_1.get("phone_number"),
     }
     url = USERS_URL + "3452899/"
     response = test_client.patch(url, json=change_data)
@@ -650,20 +635,15 @@ async def test_update_user_invalid_id(
 
 
 @pytest.mark.asyncio
-async def test_update_user_not_admin_user(
-    test_client: TestClient,
-    user_db
-):
+async def test_update_user_not_admin_user(test_client: TestClient, user_db):
     login_client(
-        client=test_client,
-        email=user_db.email,
-        password=user_db.password
+        client=test_client, email=user_db.email, password=user_db.password
     )
     change_data = {
         "email": valid_user_data_1.get("email"),
         "first_name": valid_user_data_1.get("first_name"),
         "last_name": valid_user_data_1.get("last_name"),
-        "phone_number": valid_user_data_1.get("phone_number")
+        "phone_number": valid_user_data_1.get("phone_number"),
     }
     url = USERS_URL + "1/"
     response = test_client.patch(url, json=change_data)
@@ -675,11 +655,7 @@ async def test_update_user_not_admin_user(
 
 
 @pytest.mark.asyncio
-async def test_delete_user(
-    test_client: TestClient,
-    superuser_db,
-    user_db
-):
+async def test_delete_user(test_client: TestClient, superuser_db, user_db):
     users_data = (
         valid_user_data_1,
         valid_user_data_2,
@@ -697,16 +673,15 @@ async def test_delete_user(
     login_client(
         client=test_client,
         email=superuser_db.email,
-        password=superuser_db.password
+        password=superuser_db.password,
     )
     response = test_client.get(USERS_URL)
     data = response.json()
 
     for item in data:
-        if (
-            item.get("email") == superuser_db.email or
-            user_db.email == item.get("email")
-        ):
+        if item.get(
+            "email"
+        ) == superuser_db.email or user_db.email == item.get("email"):
             continue
         id_ = item.get("id")
 
@@ -725,14 +700,11 @@ async def test_delete_user(
 
 
 @pytest.mark.asyncio
-async def test_delete_user_invalid_id(
-    test_client: TestClient,
-    superuser_db
-):
+async def test_delete_user_invalid_id(test_client: TestClient, superuser_db):
     login_client(
         client=test_client,
         email=superuser_db.email,
-        password=superuser_db.password
+        password=superuser_db.password,
     )
     url = USERS_URL + "3452899/"
     response = test_client.delete(url)
@@ -744,14 +716,9 @@ async def test_delete_user_invalid_id(
 
 
 @pytest.mark.asyncio
-async def test_delete_user_not_admin_user(
-    test_client: TestClient,
-    user_db
-):
+async def test_delete_user_not_admin_user(test_client: TestClient, user_db):
     login_client(
-        client=test_client,
-        email=user_db.email,
-        password=user_db.password
+        client=test_client, email=user_db.email, password=user_db.password
     )
     url = USERS_URL + "1/"
     response = test_client.delete(url)

@@ -1,17 +1,14 @@
 from typing import Optional
 
-from pydantic import (
-    BaseModel,
-    Field,
-)
+from pydantic import BaseModel, Field
 
 
 class ModelSectionBase(BaseModel):
     """Base schema for Seciton."""
 
     name: str = Field(
-        max_length=1,
-        min_length=150,
+        min_length=1,
+        max_length=150,
         title="Name",
         description=(
             "Уникальное название раздела, обязательное строковое поле;"
@@ -19,8 +16,8 @@ class ModelSectionBase(BaseModel):
         ),
     )
     description: str = Field(
-        max_length=1,
-        min_length=350,
+        min_length=1,
+        max_length=350,
         title="Description",
         description=(
             "Описание имя раздела модели, обязательное строковое поле;"
@@ -36,7 +33,7 @@ class ModelSectionBase(BaseModel):
                     "Раздел 'Архитектура' в проектной документации содержит "
                     "описание архитектурных решений, которые определяют облик "
                     "и функциональность объекта строительства."
-                )
+                ),
             }
         }
 
@@ -49,8 +46,8 @@ class ModelSectionUpdate(ModelSectionBase):
     """Update schema for Seciton."""
 
     name: Optional[str] = Field(
-        max_length=1,
-        min_length=150,
+        min_length=1,
+        max_length=150,
         title="Name",
         description=(
             "Уникальное название раздела, обязательное строковое поле;"
@@ -58,8 +55,8 @@ class ModelSectionUpdate(ModelSectionBase):
         ),
     )
     description: Optional[str] = Field(
-        max_length=1,
-        min_length=350,
+        min_length=1,
+        max_length=350,
         title="Description",
         description=(
             "Описание имя раздела модели, обязательное строковое поле;"
@@ -72,8 +69,7 @@ class ModelSectionDB(ModelSectionBase):
     """Base schema for Seciton."""
 
     id: int = Field(
-        title="Id section in db",
-        description="Id раздела модели в базе данных"
+        title="Id section in db", description="Id раздела модели в базе данных"
     )
 
     class Config:
@@ -88,6 +84,6 @@ class ModelSectionDB(ModelSectionBase):
                     "Раздел 'Архитектура' в проектной документации содержит "
                     "описание архитектурных решений, которые определяют облик "
                     "и функциональность объекта строительства."
-                )
+                ),
             }
         }

@@ -1,34 +1,23 @@
 from pathlib import Path
 
-import pytest
 import pytest_asyncio
-
-
 from fastapi.testclient import TestClient
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
+    async_sessionmaker,
     create_async_engine,
-    async_sessionmaker
 )
 from sqlalchemy.pool import NullPool
 
-from src.database import Base, get_async_session, User
 from src.config import test_database_config
+from src.database import Base, User, get_async_session
 from src.main import app
 
-from fastapi.testclient import TestClient
-
-from src.users.auth import get_current_admin_user, get_current_user
-
-
 engine_test = create_async_engine(
-    test_database_config.database_url,
-    poolclass=NullPool
+    test_database_config.database_url, poolclass=NullPool
 )
 async_session_maker = async_sessionmaker(
-    engine_test, class_=AsyncSession,
-    expire_on_commit=False,
-    autoflush=False
+    engine_test, class_=AsyncSession, expire_on_commit=False, autoflush=False
 )
 
 Base.metadata.bind = engine_test
