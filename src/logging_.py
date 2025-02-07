@@ -1,13 +1,13 @@
-from pathlib import Path
 import logging
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
 
 
 def configure_logging(
     log_dir: Path,
     name_app: str,
     date_format: str = "%Y-%m-%d",
-    log_format: str = '"%(asctime)s - [%(levelname)s] - %(message)s"'
+    log_format: str = '"%(asctime)s - [%(levelname)s] - %(message)s"',
 ) -> None:
     """Configure logging from this project."""
     log_dir.mkdir(exist_ok=True)
